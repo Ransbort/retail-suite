@@ -9,15 +9,20 @@ app_license = "mit"
 
 required_apps = ["erpnext"]
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "retail",
-# 		"logo": "/assets/retail/logo.png",
-# 		"title": "Retail",
-# 		"route": "/retail",
-# 		"has_permission": "retail.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "retail_suite",
+		"logo": "/assets/retail/images/retail_icon.png",
+		"title": "Retail Suite",
+		"route": "/pos",
+		"has_permission": "retail.retail.api.permission.has_app_permission"
+	}
+]
+
+
+website_route_rules = [
+	{"from_route": "/pos/<path:app_path>", "to_route": "pos"},
+]
 
 # Includes in <head>
 # ------------------

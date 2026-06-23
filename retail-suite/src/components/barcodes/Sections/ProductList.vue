@@ -203,10 +203,9 @@
                   <template v-if="row.isFirstRow">
                     <div class="flex items-center gap-2">
                       <img
-                        :src="row.image ? config.FRAPPE_URL + row.image : defaultImageSrc"
+                        :src="row.image"
                         class="h-8 w-8 rounded-md object-cover flex-shrink-0"
                         :style="{ border: '1px solid var(--card-border)' }"
-                        @error="handleImageError"
                         :alt="row.productName"
                       />
                       <div>
@@ -460,12 +459,8 @@ const filterGroup    = ref('')
 const currentPage    = ref(1)
 const itemsPerPage   = ref(20)
 
-const defaultImageSrc = ref(`${config.VUE_URL}/src/assets/img/default-product.jpg`)
-
 // ─── Helpers ─────────────────────────────────────────────
 const capitalizeFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
-
-const handleImageError = (e) => { e.target.src = defaultImageSrc }
 
 const clearFilters = () => {
   searchQuery.value   = ''

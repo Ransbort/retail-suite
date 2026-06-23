@@ -4,29 +4,30 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import svgLoader from 'vite-svg-loader'
 import vuetify from 'vite-plugin-vuetify'
-import fs from 'fs'
 import path from 'path'
 import Icons from 'unplugin-icons/vite'
-import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
+import dotenv from 'dotenv'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
+
 dotenv.config({ path: path.resolve(__dirname, '.env') })
 
-const FRAPPE_URL = process.env.VITE_FRAPPE_URL_LOCAL
-const SOCKET_TARGET = process.env.VITE_SOCKET_URL
-const SITE_NAME = process.env.VITE_SITE_NAME
-const FRAPPE_HOST = process.env.VITE_FRAPPE_HOST
-const CERTS_DIR = process.env.VITE_CERTS_DIR
+const BASE_URL  =  process.env.VITE_FRAPPE_URL_LOCAL
+const SITE_NAME =  process.env.VITE_SOCKET_URL
+const ENVTYPE = process.env.VITE_ENV || 'production'
+const SOCKET_URL = process.env.VITE_SOCKET_URL
 
-console.log("⌘ FRAPPE_URL", FRAPPE_URL)
+
+const isLocalDev = !!(ENVTYPE === 'development')
+
 
 export default defineConfig({
   optimizeDeps: {
-    include: ["feather-icons", "highlight.js/lib/core", "interactjs", "qz-tray"],
+    include: ['feather-icons', 'highlight.js/lib/core', 'interactjs', 'qz-tray'],
     exclude: ['@iconify-json/lucide'],
     esbuildOptions: {
       plugins: [{
@@ -42,51 +43,50 @@ export default defineConfig({
       }]
     }
   },
+
   plugins: [
     vue(),
     vuetify({ autoImport: true }),
     svgLoader(),
     Icons({ compiler: 'vue3', autoInstall: true }),
   ],
+
   resolve: {
     alias: { '@': resolve(__dirname, 'src') },
   },
+
   server: {
     allowedHosts: true,
     port: 5173,
     host: '0.0.0.0',
-    https: {
-      key: fs.readFileSync(`${CERTS_DIR}/${FRAPPE_HOST}+1-key.pem`),
-      cert: fs.readFileSync(`${CERTS_DIR}/${FRAPPE_HOST}+1.pem`),
-    },
-    proxy: {
+    proxy: isLocalDev ? {
       "^/(app|api|assets|files|printview)": {
-        target: FRAPPE_URL,
-        changeOrigin: true,
-        ws: true,
-        secure: false,
-        cookieDomainRewrite: FRAPPE_HOST,
+        target:              FRAPPE_URL,
+        changeOrigin:        true,
+        ws:                  true,
+        secure:              false,
       },
       '/socket.io': {
-        target: SOCKET_TARGET,
-        ws: true,
-        changeOrigin: true,
-        secure: false,
+        target:          SOCKET_URL,
+        ws:              true,
+        changeOrigin:    true,
+        secure:          false,
         rewriteWsOrigin: true,
-        headers: { 'x-frappe-site-name': SITE_NAME },
+        headers:         { 'x-frappe-site-name': SITE_NAME },
       },
-    },
+    } : undefined,
   },
+
   build: {
     outDir: path.resolve(__dirname, '../retail/public/retail_suite'),
     emptyOutDir: true,
-    assetsDir: 'assets',
+    assetsDir:   'assets',
     rollupOptions: {
       external: (id) => id.startsWith('~icons/'),
       output: {
         manualChunks: {
           vendor: ['vue', 'vue-router', 'pinia'],
-          utils: ['idb']
+          utils:  ['idb'],
         }
       }
     }

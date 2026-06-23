@@ -305,7 +305,7 @@
                           <template v-if="row.isFirstRow">
                             <div class="flex items-center gap-2">
                               <img
-                                :src="row.image ? config.FRAPPE_URL + row.image : defaultImageSrc"
+                                :src="row.image"
                                 class="h-8 w-8 rounded-md object-cover flex-shrink-0"
                                 :style="{ border: '1px solid var(--card-border)' }"
                                 @error="handleImageError"
@@ -888,7 +888,6 @@ const shiftStore     = useShiftStore()
 const inventoryStore = useInventoryStore()
 const cartStore      = useCartStore()
 const { confirm } = useConfirm()
-const defaultImageSrc = ref(`${config.VUE_URL}/src/assets/img/default-product.jpg`)
 const handleImageError = (e) => { e.target.src = 'https://via.placeholder.com/40?text=?' }
 
 

@@ -7,12 +7,11 @@ import {
 
 import { createRouter, createWebHistory } from "vue-router";
 import { session, checkSession } from '@/services/auth'
-
+import { config } from '@/config/frappe'
 import POS from "@/pages/POS.vue";
 import Pay from "@/pages/Pay.vue";
 import NonPage from "@/pages/NonPage.vue";
 import MobileScan from "@/pages/MobileScan.vue";
-import ForbiddenView from "@/pages/ForbiddenView.vue";
 import Invoice from "@/components/modals/invoiceTemplate.vue";
 const routes = [
   {
@@ -55,12 +54,6 @@ const routes = [
     }
   },
   {
-    path: '/403',
-    name: 'Forbidden',
-    component: ForbiddenView
-  },
-
-  {
     path: '/invoices/:name',
     name: 'Invoice',
     component: Invoice,
@@ -88,23 +81,18 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const isAuth = !!session.user
-  console.log('🔀 Guard:', to.path)
-  console.log('👤 session.user:', session.user)
-  console.log('✅ isAuth:', isAuth)
-  console.log('✅  to.meta.requiresAuth:', to.meta.requiresAuth)
-  if (to.path === '/') {
+  if (to.path === "/") {
     if (isAuth) {
-      return next('/pos')
-    } else {
-      console.log('🚀 Redirecting to login page')
-      const base = import.meta.env.VITE_FRAPPE_URL_LOCAL || ''
-      if (import.meta.env.VITE_ENV === 'development') {
-        window.location.href = `${base}/login?redirect-to=${encodeURIComponent(window.location.href)}`
-      } else {
-        window.location.href = `/login`
-      }
-      return next(false)
+      return next("/pos");
     }
+
+    const loginUrl = `/login?redirect-to=${encodeURIComponent(
+      window.location.href
+    )}`;
+
+    window.location.href = loginUrl;
+
+    return next(false);
   }
 
   if (to.path === '/login' && isAuth) {
@@ -112,10 +100,8 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.meta.requiresAuth && !isAuth) {
-    console.log('🚀 Redirecting to login page')
-    const base = import.meta.env.VITE_FRAPPE_URL_LOCAL || ''
-    window.location.href = `${base}/login`
-    return next(false)
+    window.location.href = `/login?redirect-to=${encodeURIComponent(window.location.href)}`;
+    return next(false);
   }
 
   if (to.meta.roles && to.meta.roles.length > 0) {
@@ -123,25 +109,11 @@ router.beforeEach(async (to, from, next) => {
     const hasAccess = to.meta.roles.some(role => userRoles.includes(role))
     if (!hasAccess) return next({ name: 'Forbidden' })
   }
-  // 👤 session.user: null
-  // ✅ isAuth: false
-  // ✅  to.meta.requiresAuth: false
+
   if (session.user === null && !to.meta.requiresAuth && !isAuth) {
-    console.log('🚀 Redirecting to login page')
-    const base = import.meta.env.VITE_FRAPPE_URL_LOCAL || ''
-    const env_type = import.meta.env.VITE_ENV
-
-    // development
-    if (env_type === 'development') {
-      window.location.href = `${base}/login?redirect-to=${encodeURIComponent(window.location.href)}`
-
-    }
-    else {
-      // production
-      window.location.href = `/login`
-    }
-
-
+    return window.location.replace(
+      `/login?redirect-to=${encodeURIComponent(window.location.href)}`
+    );
   }
   next()
 })

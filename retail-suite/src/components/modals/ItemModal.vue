@@ -205,7 +205,7 @@
             <!-- Has image -->
             <div v-else class="flex flex-col items-center">
               <img
-                :src="getImageSrc()"
+                :src="form.image"
                 :alt="form.item_name"
                 class="h-28 w-28 object-cover rounded-lg mb-2"
                 :style="{ border: '1px solid var(--card-border)' }"
@@ -323,13 +323,6 @@ const getSeriesArray = () => {
   if (!props.series) return []
   if (typeof props.series === 'string') return props.series.split(' ').filter(s => s.trim())
   return Array.isArray(props.series) ? props.series : []
-}
-
-const getImageSrc = () => {
-  if (!form.image) return ''
-  if (form.image.startsWith('data:')) return form.image
-  if (form.image.startsWith('/files/') || form.image.startsWith('/app/')) return config.FRAPPE_URL + form.image
-  return config.FRAPPE_URL + form.image || form.image
 }
 
 const getImageFileName = () => {
