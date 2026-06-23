@@ -14,7 +14,7 @@ add_to_apps_screen = [
 		"name": "retail_suite",
 		"logo": "/assets/retail/images/retail_icon.png",
 		"title": "Retail Suite",
-		"route": "/pos",
+		"route": "/desk/retail-suite",
 		"has_permission": "retail.retail.api.permission.has_app_permission"
 	}
 ]
