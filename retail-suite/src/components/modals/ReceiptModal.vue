@@ -177,6 +177,7 @@
               v-if="!props.receiptData?.isFastMode"
               class="flex-1 bg-green-500 text-white text-lg px-4 py-3 rounded-2xl focus:outline-none hover:bg-green-600 transition-colors duration-200 flex items-center justify-center"
               @click="handleProceed"
+              @keydown.enter="handleProceed"
               :disabled="isProcessing"
             >
               <CheckIcon class="w-5 h-5 mr-2" />
@@ -223,14 +224,14 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { formatPrice } from '../../utils/formatters';
 import ReceiptLogoIcon from '@/components/icons/ReceiptLogoIcon.svg'
 import PrintIcon from '@/components/icons/PrintIcon.svg'
 import CheckIcon from '@/components/icons/CheckIcon.svg'
 import CloseIcon from '@/components/icons/CloseIcon.svg'
 import { useSettingsStore } from '@/stores/settings'
-import config from '@/config/frappe'
+
 const props = defineProps({
     receiptData: {
       type: Object,
@@ -655,16 +656,17 @@ lines.push(`Thank you for your visit!`)
 return lines.join('\n')
 }
 
-// Handle escape key
-const handleEscape = (event) => {
-if (event.key === 'Escape' && !isProcessing.value) {
-  handleClose()
-}
+const handleKeydown = (event) => {
+  if (isProcessing.value) return
+  if (event.key === 'Escape') handleClose()
+  if (event.key === 'Enter') handleProceed()
+  if (event.key === 'p' && !event.ctrlKey) handlePrint()
 }
 
-// Lifecycle
 onMounted(() => {
-document.addEventListener('keydown', handleEscape)
+  document.addEventListener('keydown', handleKeydown)
 })
-
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
 </script>

@@ -31,6 +31,7 @@ export const session = reactive({
       session.full_name = data?.full_name || null
       session.email = data?.email || null
       session.login.reset()
+      console.log('👤user session:', session)
       router.push({ name: 'POS' })
     },
     onError(err) {
@@ -56,28 +57,36 @@ export const session = reactive({
 // ==========================================
 // Check Existing Session (API-based)
 // ==========================================
-export async function checkSession() {
-  try {
-    const data = await frappeRequest({
-      url: '/api/method/frappe.auth.get_logged_user',
-    })
-    console.log("👤 Logged in user:", data)
-    const user = data
-    if (!user || user === 'Guest') {
-      session.user = null
-      return false
-    }
+// export async function checkSession() {
+//   try {
+//     const data = await frappeRequest({
+//       url: '/api/method/frappe.auth.get_logged_user',
+//     })
+//     console.log("👤 Logged in user:", data)
+//     const user = data
+//     if (!user || user === 'Guest') {
+//       session.user = null
+//       return false
+//     }
 
+//     session.user = user
+//     return true
+
+//   } catch (err) {
+//     // 403 or network error = not logged in
+//     session.user = null
+//     return false
+//   }
+// }
+export async function checkSession() {
+  const user = sessionUser()
+  if (user) {
     session.user = user
     return true
-
-  } catch (err) {
-    // 403 or network error = not logged in
-    session.user = null
-    return false
   }
+  session.user = null
+  return false
 }
-
 // ==========================================
 // API Methods
 // ==========================================

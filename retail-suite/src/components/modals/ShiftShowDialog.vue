@@ -808,10 +808,6 @@ const buildInvoiceHTML = (inv) => {
 </body>
 </html>`
 }
-// const viewInvoice = async (inv) => {
-//   const receipt = toRaw(inv)
-//   window.open(`/invoices/${receipt.name}`, '_blank')
-// }
 
 
 const printInvoice = async (invoice) => {

@@ -737,7 +737,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { decodeBarcodeFromImage, checkBarcodeServerDeps } from '@/composables/barcode'
-import config from '@/config/frappe'
 
 // ── Props & Emits ──────────────────────────────────────────
 const props = defineProps({
