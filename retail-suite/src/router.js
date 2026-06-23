@@ -7,7 +7,6 @@ import {
 
 import { createRouter, createWebHistory } from "vue-router";
 import { session, checkSession } from '@/services/auth'
-import { config } from '@/config/frappe'
 import POS from "@/pages/POS.vue";
 import Pay from "@/pages/Pay.vue";
 import NonPage from "@/pages/NonPage.vue";
@@ -74,47 +73,33 @@ const router = createRouter({
 
 let sessionChecked = false;
 router.beforeEach(async (to, from, next) => {
-
   if (!sessionChecked) {
     await checkSession()
     sessionChecked = true
   }
 
   const isAuth = !!session.user
-  if (to.path === "/") {
-    if (isAuth) {
-      return next("/pos");
-    }
 
-    const loginUrl = `/login?redirect-to=${encodeURIComponent(
-      window.location.href
-    )}`;
-
-    window.location.href = loginUrl;
-
-    return next(false);
-  }
-
-  if (to.path === '/login' && isAuth) {
-    return next('/pos')
+  if (to.path === '/') {
+    if (isAuth) return next('/pos')
+    window.location.href = import.meta.env.MODE === 'development'
+      ? `${import.meta.env.VITE_FRAPPE_URL}/login?redirect-to=${encodeURIComponent(window.location.href)}`
+      : `/login?redirect-to=${encodeURIComponent(window.location.href)}`
+    return next(false)
   }
 
   if (to.meta.requiresAuth && !isAuth) {
-    window.location.href = `/login?redirect-to=${encodeURIComponent(window.location.href)}`;
-    return next(false);
+    window.location.href = import.meta.env.MODE === 'development'
+      ? `${import.meta.env.VITE_FRAPPE_URL}/login?redirect-to=${encodeURIComponent(window.location.href)}`
+      : `/login?redirect-to=${encodeURIComponent(window.location.href)}`
+    return next(false)
   }
 
-  if (to.meta.roles && to.meta.roles.length > 0) {
-    const userRoles = session.roles || []
-    const hasAccess = to.meta.roles.some(role => userRoles.includes(role))
+  if (to.meta.roles?.length > 0) {
+    const hasAccess = to.meta.roles.some(role => (session.roles || []).includes(role))
     if (!hasAccess) return next({ name: 'Forbidden' })
   }
 
-  if (session.user === null && !to.meta.requiresAuth && !isAuth) {
-    return window.location.replace(
-      `/login?redirect-to=${encodeURIComponent(window.location.href)}`
-    );
-  }
   next()
 })
 export default router;

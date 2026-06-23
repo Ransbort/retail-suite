@@ -423,8 +423,6 @@ import { BarChart2, Search, PackageSearch, Edit2, Trash2, Plus, Eye, Download, S
 import { useToast }             from 'vue-toastification'
 import LoadingSpinner from '@/components/icons/LoadingSpinner.vue'
 import { getBarcodesFromFrappeDB } from '@/composables/barcode'
-import config from '@/config/frappe'
-
 // ─── Props ───────────────────────────────────────────────
 const props = defineProps({
   products:     { type: Array,   default: () => [] },

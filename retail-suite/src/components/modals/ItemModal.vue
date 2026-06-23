@@ -270,7 +270,6 @@
 <script setup>
 import { ref, reactive, watch } from 'vue'
 import { X } from 'lucide-vue-next'
-import config from '@/config/frappe'
 
 const props = defineProps({
   show:       { type: Boolean, default: false },

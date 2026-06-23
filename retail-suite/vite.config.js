@@ -15,11 +15,14 @@ const __dirname = dirname(__filename)
 
 
 dotenv.config({ path: path.resolve(__dirname, '.env') })
-
-const BASE_URL  =  process.env.VITE_FRAPPE_URL_LOCAL
-const SITE_NAME =  process.env.VITE_SOCKET_URL
-const ENVTYPE = process.env.VITE_ENV || 'production'
+const BASE_URL   = process.env.VITE_FRAPPE_URL
+const SITE_NAME  = process.env.SITE_NAME
 const SOCKET_URL = process.env.VITE_SOCKET_URL
+const ENVTYPE    = process.env.MODE || 'production'
+console.log("ENVTYPE",ENVTYPE)
+console.log("SOCKET_URL",SOCKET_URL)
+console.log("BASE_URL",BASE_URL)
+console.log("SITE_NAME",SITE_NAME)
 
 
 const isLocalDev = !!(ENVTYPE === 'development')
@@ -58,10 +61,10 @@ export default defineConfig({
   server: {
     allowedHosts: true,
     port: 5173,
-    host: '0.0.0.0',
+    host: BASE_URL,
     proxy: isLocalDev ? {
       "^/(app|api|assets|files|printview)": {
-        target:              FRAPPE_URL,
+        target:              BASE_URL,
         changeOrigin:        true,
         ws:                  true,
         secure:              false,

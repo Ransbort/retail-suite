@@ -160,7 +160,7 @@ watch(() => props.searchKeyword, async (kw) => {
 
 watch(
   () => [productsStore.selectedPriceList, productsStore.selectedWarehouse],
-  () => productsStore.loadProductsFromFrappeDB(true)  // forceReload
+  () => productsStore.loadProductsFromFrappeDB(true)
 )
 
 watch(isShiftOpen, async (val) => {

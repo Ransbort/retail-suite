@@ -177,7 +177,6 @@ import TrashIcon from '@/components/icons/TrashIcon.svg'
 import ImageIcon from '@/components/icons/ImageIcon.svg'
 import {formatPrice} from '@/utils/formatters'
 import { useSettingsStore } from '@/stores/settings'
-import config from '@/config/frappe'
 import { useConfirm } from '@/composables/useConfirm'
 
 const props = defineProps({

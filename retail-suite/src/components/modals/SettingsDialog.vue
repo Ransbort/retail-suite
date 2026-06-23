@@ -228,7 +228,7 @@
 
                   <div class="form-group mt-4">
                     <label class="form-label" :style="{ color: 'var(--text-sub)' }">{{ __('Receipt Size') }}</label>
-                    <select v-model="settings.receipt.size" class="form-input" :style="inputStyle">
+                    <select v-model="settings.printer.paperSize" class="form-input" :style="inputStyle">
                       <option value="80mm">{{ __('80mm (Thermal Printer)') }}</option>
                       <option value="58mm">{{ __('58mm (Small)') }}</option>
                       <option value="A4">{{ __('A4 (Standard)') }}</option>
@@ -275,7 +275,7 @@
                     <Info class="w-4 h-4 flex-shrink-0" :style="{ color: primaryColor }" />
                     <p class="text-xs" :style="{ color: 'var(--text-sub)' }">
                       {{ __('Currency and Price List are read from') }}
-                      <a href="/desk/pos-profile" target="_blank" class="underline font-medium" :style="{ color: primaryColor }">POS Profile</a>
+                      <a :href="`/desk/pos-profile/${posProfile.name}`" target="_blank" class="underline font-medium" :style="{ color: primaryColor }">POS Profile</a>
                       {{ __('and cannot be changed here.') }}
                     </p>
                   </div>
@@ -513,13 +513,6 @@
                   <div class="toggle-list mb-6">
                     <div class="toggle-row" :style="toggleRowStyle">
                       <div>
-                        <p class="toggle-label" :style="{ color: 'var(--text-sub)' }">{{ __('Show Scanner Status') }}</p>
-                        <p class="toggle-desc" :style="{ color: 'var(--text-muted)' }">{{ __('Display whether the scanner is connected') }}</p>
-                      </div>
-                      <ToggleSwitch v-model="settings.system.showScannerStatus" />
-                    </div>
-                    <div class="toggle-row" :style="toggleRowStyle">
-                      <div>
                         <p class="toggle-label" :style="{ color: 'var(--text-sub)' }">{{ __('Offline Mode') }}</p>
                         <p class="toggle-desc" :style="{ color: 'var(--text-muted)' }">{{ __('Work offline when internet is not available') }}</p>
                       </div>
@@ -645,7 +638,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick, toRaw } from 'vue'
 import {
   Settings, Save, X, Store, Receipt, BadgePercent, Palette, Volume2,
   Printer, Keyboard, Cog, Sun, Moon, Check, Info, DollarSign, Lock,
@@ -661,6 +654,7 @@ import { useShiftStore } from '@/stores/shift'
 import SaudiArabiaFlag from '@/components/icons/flag-saudi-arabia.svg'
 import UnitedStatesFlag from '@/components/icons/flag-usa.svg'
 import { useToast } from '@/composables/useToast'
+import { storeToRefs } from 'pinia'
 import { getCountries, getCountryCallingCode, AsYouType, parsePhoneNumber } from 'libphonenumber-js'
 // ── Props & Emits ──
 const props = defineProps({
@@ -798,22 +792,22 @@ watch(phoneInfo, (info) => {
 const validateStore = () => {
   const s = settings.value.store
 
-  if (!s.name?.trim())    errors.value.storeName    = __('Store Name is required')
+  if (!s.name)    errors.value.storeName    = __('Store Name is required')
   else                    delete errors.value.storeName
 
-  if (!s.address?.trim()) errors.value.storeAddress = __('Address is required')
+  if (!s.address) errors.value.storeAddress = __('Address is required')
   else                    delete errors.value.storeAddress
 
-  if (!s.phone?.trim())        errors.value.storePhone = __('Phone number is required')
+  if (!s.phone)        errors.value.storePhone = __('Phone number is required')
   else if (!phoneInfo.value.valid) errors.value.storePhone = __('Invalid phone number (e.g. +966 50 000 0000)')
   else                         delete errors.value.storePhone
 
-  if (!s.email?.trim())   errors.value.storeEmail   = __('Email is required')
+  if (!s.email)   errors.value.storeEmail   = __('Email is required')
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email)) errors.value.storeEmail = __('Invalid email address')
   else                    delete errors.value.storeEmail
 
-  if (!s.taxId?.trim())   errors.value.storeTaxId   = __('Commercial Registration Number is required')
-  else                    delete errors.value.storeTaxId
+  if (!s.taxId) errors.value.storeTaxId = __('Commercial Registration Number is required')
+  else          delete errors.value.storeTaxId
 }
 
 const validatePricing = () => {
@@ -843,7 +837,6 @@ const validateAll = () => {
   errors.value = {}
   validateStore()
   validatePricing()
-  validatePrinter()
   return Object.keys(errors.value).length === 0
 }
 
@@ -1056,9 +1049,14 @@ const handleKeydown = (e) => {
 watch(
   () => shiftStore.pos_profile,
   (profile) => {
-    if (profile) settingsStore.syncPOSSettings(profile)
+    if (profile) {
+      settingsStore.syncPOSSettings(profile)
+    }
   },
-  { immediate: true }
+  {
+    immediate: true,
+    deep: true
+  }
 )
 
 onMounted(() => {
@@ -1089,6 +1087,21 @@ const exportData = () => {
     toast({ title: __('Data exported successfully'), icon: 'check', iconClasses: 'text-green-500' })
   } catch (e) { console.error(e) }
 }
+const { pos_profile } = storeToRefs(shiftStore)
+const posProfile = computed(() => shiftStore.pos_profile)
+watch(
+  pos_profile,
+  (profile) => {
+    if (!profile) return
+
+    console.log("profile ready", toRaw(profile))
+
+    settingsStore.syncPOSSettings(toRaw(profile))
+  },
+  {
+    immediate: true
+  }
+)
 
 const clearAllData = async () => {
   const ok = await confirm({
@@ -1099,7 +1112,7 @@ const clearAllData = async () => {
   })
   if (!ok) return
   localStorage.clear()
-  settingsStore.resetSettings()
+  settingsStore.resetSettings(posProfile.value)
 }
 
 const creatSampleItems = async () => {

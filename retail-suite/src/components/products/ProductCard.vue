@@ -14,7 +14,6 @@
         class="w-10/12 mx-auto h-24 sm:h-32 md:h-40 object-contain transition-transform duration-300 group-hover:scale-105"
         style="padding: 4px;"
       />
-      <p>Hello Ahmed</p>
       <!-- Stock Badge -->
       <div
         class="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-semibold"
@@ -207,7 +206,6 @@ import { ref, computed} from 'vue'
 import { formatPrice } from '@/utils/formatters'
 import  PlusIcon from '@/components/icons/PlusIcon.svg';
 import LoadingSpinner from '../icons/LoadingSpinner.vue';
-import config from '@/config/frappe'
 import { useCartStore } from '@/stores/cart'
 import { useProductsStore } from '@/stores/products'
 

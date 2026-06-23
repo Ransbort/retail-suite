@@ -5,9 +5,6 @@ import { useShiftStore } from "./shift";
 import { changeLanguage } from "@/i18n/index";
 import { createResource } from "frappe-ui";
 
-// ─────────────────────────────────────────────
-// Color utilities
-// ─────────────────────────────────────────────
 function hexToHsl(hex) {
   let r = parseInt(hex.slice(1, 3), 16) / 255;
   let g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -65,9 +62,6 @@ function applyVisualSettings(appearance) {
   applyTheme(appearance.theme);
 }
 
-// ─────────────────────────────────────────────
-// Store
-// ─────────────────────────────────────────────
 export const useSettingsStore = defineStore("settings", () => {
 
   const shiftStore = useShiftStore();
@@ -99,7 +93,7 @@ export const useSettingsStore = defineStore("settings", () => {
       primaryColor: "#06b6d4",
     },
     printer: {
-      painterIP:      "",
+      printerIP:      "",
       paperSize:      "",
       printerPort:    "",
       printerType:    "",
@@ -114,12 +108,12 @@ export const useSettingsStore = defineStore("settings", () => {
     },
   });
 
-  // ── Sync from POS Profile ──────────────────
-const syncPOSSettings = (profile) => {
-  const p = profile || shiftStore.pos_profile
-  console.log("profile:", p)
-     if (!p) return
-
+const syncPOSSettings = (p) => {
+    console.log("p.posa_paper_size",p.posa_paper_size)
+    if (!p) {
+      console.warn("No POS profile to sync")
+      return
+    }
     // Store
     settings.store.name = p.posa_store_name || "";
     settings.store.storeLogo = p.posa_store_logo || "";
@@ -129,8 +123,8 @@ const syncPOSSettings = (profile) => {
     settings.store.taxId   = p.posa_tax_id || "";
 
     // Receipt
-    settings.receipt.showLogo      = !!p.posa_show_store_logo;
-    settings.receipt.showThankYou  = !!p.posa_show_thank_you;
+    settings.receipt.showLogo      = Boolean(p.posa_show_store_logo);
+    settings.receipt.showThankYou  = Boolean(p.posa_show_thank_you);
     settings.receipt.footerMessage = p.posa_footer_message || "";
 
     // Appearance
@@ -142,7 +136,7 @@ const syncPOSSettings = (profile) => {
     settings.pricing.currency   = p.currency            || "";
     settings.pricing.taxName    = p.taxes_and_charges   || "";
     settings.pricing.taxCategory = p.tax_category        || "";
-    settings.pricing.enableTax  = !!p.posa_tax_inclusive;
+    settings.pricing.enableTax  = Boolean(p.posa_tax_inclusive);
 
     // Printer
     settings.printer.printerIP        = p.posa_printer_ip || "";
@@ -153,31 +147,20 @@ const syncPOSSettings = (profile) => {
     settings.printer.height           = p.posa_paper_height || 0;
 
     // System
-    settings.system.offlineMode       = !!p.posa_offline_mode;
-    settings.system.soundEffects      = !!p.posa_sound_effects;
+    settings.system.offlineMode       = Boolean(p.posa_offline_mode);
+    settings.system.soundEffects      = Boolean(p.posa_sound_effects);
     settings.system.language          = p.posa_language      || "en";
     settings.system.itemsPerPage      = p.posa_items_per_page || 20;
 
     applyVisualSettings(settings.appearance);
   };
 
-  // ── Watch pos_profile ──────────────────────
-watch(
-  () => shiftStore.pos_profile,
-  (profile) => {
-    if (profile) {
-      syncPOSSettings(profile)
-    }
-  },
-  { immediate: true }
-)
-  // ── Save to POS Profile (الحفظ الوحيد) ────
   const saveToPOSProfile = async () => {
     if (!shiftStore.pos_profile?.name) {
       console.warn("❌ no pos_profile — cannot save");
       return;
     }
-
+    console.log("Names",shiftStore.pos_profile.name)
     const posProfileResource = createResource({
       url: "retail.retail.api.setting.update_pos_profile_settings",
     });
@@ -192,7 +175,7 @@ watch(
         posa_store_address:         settings.store.address,
         posa_store_phone:           settings.store.phone,
         posa_store_email:           settings.store.email,
-        posa_tax_id:                settings.store.taxId,
+        posa_tax_id: settings.store.taxId ? parseInt(settings.store.taxId) : 0,
         // Receipt
         posa_show_store_logo:       settings.receipt.showLogo,
         posa_show_thank_you:        settings.receipt.showThankYou,
@@ -208,7 +191,7 @@ watch(
         posa_tax_inclusive:         settings.pricing.enableTax,
         // Printer
         posa_printer_ip:            settings.printer.printerIP,
-        posa_printer_port:          settings.printer.printerPort,
+        posa_printer_port: settings.printer.printerPort ? parseInt(settings.printer.printerPort) : 0,
         posa_printer_type:          settings.printer.printerType,
         posa_paper_size:            settings.printer.paperSize,
         posa_paper_width:           settings.printer.width,
@@ -236,19 +219,20 @@ watch(
     }
   };
 
-const updateSettings = async (patch) => {
-  for (const section of Object.keys(patch)) {
-    if (settings[section]) {
-      Object.assign(settings[section], patch[section])
+  const updateSettings = async (patch) => {
+    for (const section of Object.keys(patch)) {
+      if (settings[section]) {
+        Object.assign(settings[section], patch[section])
+      }
     }
+    await saveSettings()
   }
-  await saveSettings()
-}
 
-  const resetSettings = () => {
-    syncPOSSettings();
+  const resetSettings = (profile) => {
+    syncPOSSettings(profile);
     applyVisualSettings(settings.appearance);
   };
+
   return {
     settings,
     saveSettings,

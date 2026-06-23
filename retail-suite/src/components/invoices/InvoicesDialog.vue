@@ -265,11 +265,15 @@ const openDraftInvoice = (invoiceName) => {
   }
 }
 
-
-
 const deleteDraft = async (name) => {
-  emit('delete-draft', name)
-  // Optimistically remove from local list; parent can also trigger a refresh
+  const doc = createDocumentResource({
+    doctype: 'Sales Invoice',
+    name: name,
+  })
+  await doc.get.fetch()
+  if (doc.doc) {
+    await doc.delete.submit()
+  }
   draftInvoices.value = draftInvoices.value.filter(inv => inv.name !== name)
   expandedInvoices.value.delete(name)
 }

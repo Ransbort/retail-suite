@@ -866,7 +866,6 @@ import { useShiftStore }       from '@/stores/shift'
 import { useCartStore }        from '@/stores/cart'
 import { useInventoryStore }   from '@/stores/inventory'
 import { useToast }            from 'vue-toastification'
-import config from '@/config/frappe'
 import {getItemGroup} from '@/composables/pos'
 import {
   generateBarcodePreview,
