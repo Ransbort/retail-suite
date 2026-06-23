@@ -245,7 +245,7 @@
 
                       <img
                         v-if="scanResult.product.image"
-                        :src="frappeUrl + scanResult.product.image"
+                        :src="scanResult.product.image"
                         class="w-12 h-12 rounded-lg object-cover shrink-0 product-image"
                         @error="e => e.target.style.display='none'"
                       />
@@ -747,7 +747,6 @@ const props = defineProps({
 })
 const emit = defineEmits(['addToCart', 'assign', 'close'])
 
-const frappeUrl = config.FRAPPE_URL
 const mode = ref('scan')
 
 // ══════════════════════════════════════════

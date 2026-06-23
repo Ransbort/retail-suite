@@ -247,21 +247,12 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'proceed', 'print', 'email', 'save'])
 
-// const logoSrc = '@/assets/img/receipt-logo.png'
 // Stores
 const settingsStore = useSettingsStore()
 const settings = computed(() => settingsStore.settings)
 const storeName = computed(() => settings.value?.store?.name || 'TAILWIND POS')
-const defaultLogoSrc = `${config.VUE_URL}/src/assets/img/receipt-logo.png`
-const storeLogo = computed(() => {
-  const logo = settings.value?.store?.storeLogo
-  if (!logo) return defaultLogoSrc
+const storeLogo = computed(() =>  settings.value?.store?.storeLogo)
 
-  // decode أي encoding موجود الأول، وبعدين encode صح
-  const cleanPath = decodeURIComponent(logo.replace(/%2520/g, '%20'))
-  console.log('cleanPath', cleanPath)
-  return new URL(cleanPath, config.FRAPPE_URL).href
-})
 
 console.log('storeLogo', storeLogo.value)
 const storeAddress = computed(() => settings.value?.store?.address || 'CABANG KONOHA SELATAN')

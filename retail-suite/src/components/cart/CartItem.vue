@@ -11,11 +11,10 @@
     <!-- Product Image -->
     <div class="flex-shrink-0 mr-2">
       <img
-        :src="currentSrc"
+        :src="item.image"
         :alt="item.item_name"
         class="rounded-lg h-10 w-10 shadow object-cover"
         :style="{ background: 'var(--card-bg)' }"
-        @error="handleImageError"
       />
     </div>
 
@@ -207,17 +206,10 @@ const primaryColor = computed(() => {
   return settings.value?.appearance?.primaryColor || '#06b6d4'
 })
 const isUpdating = ref(false)
-const imageError = ref(false)
 const hasError = ref(false)
 const displayQuantity = ref(props.item.qty)
 const pendingQuantity = ref(props.item.qty)
-const defaultImage = '/src/assets/img/default-product.jpg'
-const defaultImageSrc = `${config.VUE_URL}${defaultImage}`
-const currentSrc = ref(
-  props.item?.image
-    ? `${config.VUE_URL}${props.item?.image}`
-    : defaultImageSrc
-)
+
 const isSerialItem = computed(() => !!props.item.serial_no)
 
 // Computed properties
@@ -233,11 +225,6 @@ watch(
   }
 )
 
-// Handle image loading error
-const handleImageError = () => {
-  currentSrc.value = defaultImage
-  imageError.value = false
-}
 const increaseQuantity = () => {
 
   if (isSerialItem.value) {

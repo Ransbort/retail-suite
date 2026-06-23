@@ -85,7 +85,7 @@ def get_opening_dialog_data():
         pos_profiles_list.append(i.name)
 
     data["payments_method"] = frappe.get_list(
-        "Sales Invoice Payment",
+        "POS Payment Method",
         filters={"parent": ["in", pos_profiles_list]},
         fields=["*"],
         limit_page_length=0,

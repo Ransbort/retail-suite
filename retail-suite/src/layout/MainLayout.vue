@@ -560,7 +560,7 @@ onMounted(async () => {
     userName.value = userInfo.full_name || userInfo.user
     userEmail.value = userInfo.email
     userAvatar.value = userInfo.user_image
-      ? config.FRAPPE_URL + userInfo.user_image
+      ? `${window.location.origin}${userInfo.user_image}`
       : `https://ui-avatars.com/api/?name=${encodeURIComponent(userInfo.full_name)}&background=0D8ABC&color=fff`
   }
 

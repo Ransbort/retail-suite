@@ -9,13 +9,12 @@
     <!-- Product Image -->
     <div class="relative overflow-hidden" style="background: var(--item-bg);">
       <img
-        :src="currentSrc"
+        :src="product.image"
         :alt="product.name"
         class="w-10/12 mx-auto h-24 sm:h-32 md:h-40 object-contain transition-transform duration-300 group-hover:scale-105"
         style="padding: 4px;"
-        @error="handleImageError"
       />
-
+      <p>Hello Ahmed</p>
       <!-- Stock Badge -->
       <div
         class="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-semibold"
@@ -226,7 +225,6 @@ const emit = defineEmits(['add-to-cart', 'remove-from-cart', 'view-details'])
 const store = useProductsStore()
 
 const isLoading = ref(false)
-const imageError = ref(false)
 const showSerialPicker = ref(false)
 const showBatchPicker = ref(false)
 
@@ -266,7 +264,6 @@ const inactiveUomStyle = {
   borderColor: 'var(--card-border)',
 }
 
-const defaultImageSrc = `${config.VUE_URL}/src/assets/img/default-product.jpg`
 
 const stockLabel = computed(() => {
   const qty = props.product.actual_qty
@@ -368,20 +365,6 @@ const basePayload = () => ({
   rate: Rate.value,
   conversion_factor: currentUomInfo.value.conversion_factor || 1,
 })
-
-const currentSrc = computed(() => {
-  if (!props.product?.image) return defaultImageSrc
-
-  if (props.product.image.startsWith('http')) {
-    return props.product.image
-  }
-
-  return `${config.FRAPPE_URL}${props.product.image}`
-})
-
-const handleImageError = () => {
-  imageError.value = true
-}
 </script>
 
 <style scoped>
