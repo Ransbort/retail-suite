@@ -1,3 +1,5 @@
+from retail.utils import get_build_version
+
 app_name = "retail"
 app_title = "Retail"
 app_publisher = "Ahmed Abu-khatwa"
@@ -26,11 +28,12 @@ website_route_rules = [
 
 # Includes in <head>
 # ------------------
+# Get unique build version for cache busting
 
-# include js, css files in header of desk.html
-# app_include_css = "/assets/retail/css/retail.css"
-# app_include_js = "/assets/retail/js/retail.js"
+_dist_version = get_build_version()
 
+app_include_css = f"/assets/retail/css/retail.css?v={_dist_version}"
+app_include_js = f"/assets/retail/js/retail.js?v={_dist_version}"
 # include js, css files in header of web template
 # web_include_css = "/assets/retail/css/retail.css"
 # web_include_js = "/assets/retail/js/retail.js"

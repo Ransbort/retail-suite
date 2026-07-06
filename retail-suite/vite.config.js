@@ -1,5 +1,6 @@
 // vite.config.js
 import { defineConfig } from 'vite'
+import { writeFileSync } from 'fs'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import svgLoader from 'vite-svg-loader'
@@ -27,6 +28,27 @@ console.log("SITE_NAME",SITE_NAME)
 
 const isLocalDev = !!(ENVTYPE === 'development')
 
+function versionPlugin() {
+  return {
+    name: 'generate-version-file',
+    closeBundle() {
+      const buildVersion = process.env.RETAIL_BUILD_VERSION || Date.now().toString()
+      const versionData = {
+        version: buildVersion,
+        timestamp: new Date().toISOString(),
+        buildDate: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+      }
+
+      const outputPath = resolve(__dirname, '../retail/public/retail_suite/version.json')
+      writeFileSync(outputPath, JSON.stringify(versionData, null, 2))
+      console.log(`✓ Generated version.json: ${buildVersion}`)
+    },
+  }
+}
 
 export default defineConfig({
   optimizeDeps: {
@@ -52,6 +74,7 @@ export default defineConfig({
     vuetify({ autoImport: true }),
     svgLoader(),
     Icons({ compiler: 'vue3', autoInstall: true }),
+    versionPlugin(),
   ],
 
   resolve: {
