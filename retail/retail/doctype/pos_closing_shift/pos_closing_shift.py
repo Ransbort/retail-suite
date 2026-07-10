@@ -236,7 +236,7 @@ def make_closing_shift_from_opening(opening_shift :dict, closing_details :list):
             (d for d in closing_details if d.get("modeOfPayment") == mop), None
         )
         pay.closing_amount = flt(closing_detail.get("closingBalance")) if closing_detail else 0
-        diff = pay.expected_amount + pay.opening_amount - pay.closing_amount
+        diff = flt(pay.expected_amount + pay.opening_amount - pay.closing_amount, 2)
         pay.difference = diff
         if diff != 0:
             can_close = False
