@@ -1,6 +1,7 @@
 [
  {
   "doctype": "Custom Field",
+  "name": "POS Profile-custom_allow_close_shift_with_draft_invoice",
   "dt": "POS Profile",
   "module": "Retail",
   "fieldname": "custom_allow_close_shift_with_draft_invoice",
