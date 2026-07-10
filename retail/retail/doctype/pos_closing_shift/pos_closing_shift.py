@@ -66,7 +66,7 @@ class POSClosingShift(Document):
         opening_entry.pos_closing_shift = self.name
         opening_entry.set_status()
         self.delete_draft_invoices()
-        submit_printed_invoices(opening_entry.pos_opening_shift)
+        submit_printed_invoices(opening_entry.name)
         opening_entry.save()
 
     def delete_draft_invoices(self):
