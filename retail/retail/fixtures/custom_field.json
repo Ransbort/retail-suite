@@ -1,0 +1,19 @@
+[
+ {
+  "doctype": "Custom Field",
+  "dt": "POS Profile",
+  "module": "Retail",
+  "fieldname": "custom_allow_close_shift_with_draft_invoice",
+  "label": "Allow Close Shift with Draft Invoice",
+  "fieldtype": "Check",
+  "default": "0",
+  "insert_after": "posa_allow_partial_payment",
+  "description": "If enabled, POS shifts can be closed even if there are unsubmitted (draft) invoices in the shift period.",
+  "allow_on_submit": 0,
+  "hidden": 0,
+  "no_copy": 0,
+  "print_hide": 0,
+  "read_only": 0,
+  "translatable": 0
+ }
+]
