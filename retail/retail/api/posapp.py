@@ -573,6 +573,12 @@ def _get_customer_names(pos_profile):
         order_by="name asc"
     )
 
+def _has_address_data(payload: dict) -> bool:
+    """Only treat address as provided if a meaningful field was actually filled in.
+    Skips 'country' (always has a default) and the is_primary/is_shipping flags."""
+    meaningful_fields = ("line1", "line2", "city", "state", "pincode")
+    return any(payload.get(f) for f in meaningful_fields)
+
 @frappe.whitelist()
 def create_customer(
     customer_name,
@@ -647,11 +653,13 @@ def create_customer(
 
         cust_name = customer_doc.name
 
-        # 2. Address
-        saved_address = create_address(
-            customer=cust_name,
-            **address_payload
-        )
+        # 2. Address — only create if the user actually entered address data
+        saved_address = None
+        if _has_address_data(address_payload):
+            saved_address = create_address(
+                customer=cust_name,
+                **address_payload
+            )
 
         # 3. Contact
         create_contact(
@@ -706,7 +714,10 @@ def create_customer(
             saved_address = update_address(primary_address["name"], **address_payload)
             contact_payload["address_name"] = primary_address["name"]
         else:
-            saved_address = create_address(customer=customer_id, **address_payload)
+            # only create if the user actually entered address data
+            saved_address = None
+            if _has_address_data(address_payload):
+                saved_address = create_address(customer=customer_id, **address_payload)
             contact_payload["address_name"] = saved_address["name"] if saved_address else None
 
         if primary_contact:
